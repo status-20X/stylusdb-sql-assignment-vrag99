@@ -11,11 +11,11 @@ test('Read CSV File', async () => {
 });
 
 test('Parse SQL Query', () => {
-    const query = 'SELECT id, name FROM sample';
+    const query = 'SELECT id, name FROM student';
     const parsed = parseQuery(query);
     expect(parsed).toEqual({
         fields: ['id', 'name'],
-        table: 'sample',
+        table: 'student',
         whereClauses: [],
         joinCondition: null,
         joinTable: null
@@ -23,7 +23,7 @@ test('Parse SQL Query', () => {
 });
 
 test('Execute SQL Query', async () => {
-    const query = 'SELECT id, name FROM sample';
+    const query = 'SELECT id, name FROM student';
     const result = await executeSELECTQuery(query);
     expect(result.length).toBeGreaterThan(0);
     expect(result[0]).toHaveProperty('id');
