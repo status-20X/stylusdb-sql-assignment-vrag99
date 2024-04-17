@@ -2,7 +2,12 @@ function parseQuery(query) {
   // Trim the query to remove any leading/trailing whitespaces
   query = query.trim();
 
-  const orderBySplit = query.split(/\sORDER BY\s/i);
+  const limitSplit = query.split(/\sLIMIT\s/i);
+  const queryWithoutLimit = limitSplit[0]; // Everything before LIMIT clause
+
+  let limit = limitSplit.length > 1 ? parseInt(limitSplit[1]) : null;
+
+  const orderBySplit = queryWithoutLimit.split(/\sORDER BY\s/i);
   const queryWithoutOrderBy = orderBySplit[0]; // Everything before ORDER BY clause
 
   let orderByFields =
@@ -43,7 +48,7 @@ function parseQuery(query) {
   // Parse the SELECT part
   const selectRegex = /^SELECT\s(.+?)\sFROM\s(.+)/i;
   const selectMatch = selectPart.match(selectRegex);
-  console.log("selectMatch: ", selectMatch)
+
   if (!selectMatch) {
     throw new Error("Invalid SELECT format");
   }
@@ -66,7 +71,6 @@ function parseQuery(query) {
   const hasAggregateWithoutGroupBy =
     aggregateFunctionRegex.test(query) && !groupByFields;
 
-
   return {
     fields: fields.split(",").map((field) => field.trim()),
     table: table.trim(),
@@ -77,6 +81,7 @@ function parseQuery(query) {
     groupByFields,
     hasAggregateWithoutGroupBy,
     orderByFields,
+    limit,
   };
 }
 
