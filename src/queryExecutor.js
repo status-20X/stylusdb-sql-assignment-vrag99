@@ -13,7 +13,8 @@ async function executeINSERTQuery(query) {
     newData[column] = values[index];
   });
 
-  return writeCSV(file, [...currentData, newData]);
+  await writeCSV(file, [...currentData, newData]);
+  return { message: "Rows added successfully" };
 }
 
 async function executeDELETEQuery(query) {
@@ -28,7 +29,9 @@ async function executeDELETEQuery(query) {
         )
       : [];
 
-  return writeCSV(file, updatedData);
+  await writeCSV(file, updatedData);
+
+  return { message: "Rows deleted successfully." };
 }
 
 module.exports = { executeINSERTQuery, executeDELETEQuery };
