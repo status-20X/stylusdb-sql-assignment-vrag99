@@ -100,7 +100,11 @@ function parseWhereClause(whereString) {
   return whereString.split(/ AND | OR /i).map((conditionString) => {
     if (conditionString.includes(" LIKE ")) {
       const [field, pattern] = conditionString.split(/\sLIKE\s/i);
-      return { field: field.trim(), operator: "LIKE", value: pattern.trim().replace(/^'(.*)'$/, '$1') };
+      return {
+        field: field.trim(),
+        operator: "LIKE",
+        value: pattern.trim().replace(/^'(.*)'$/, "$1"),
+      };
     } else {
       const conditionRegex = /(.*?)(=|!=|>|<|>=|<=)(.*)/;
       const match = conditionString.match(conditionRegex);
@@ -150,8 +154,39 @@ function parseInsertQuery(query) {
     type: "INSERT",
     table,
     columns: columns.split(",").map((column) => column.trim()),
-    values: values.split(",").map((value) => value.trim().replace(/^'(.*)'$/, '$1')),
+    values: values
+      .split(",")
+      .map((value) => value.trim().replace(/^'(.*)'$/, "$1")),
   };
 }
 
-module.exports = { parseSelectQuery, parseJoinClause, parseInsertQuery };
+function parseDeleteQuery(query) {
+  query = query.trim();
+
+  const whereSplit = query.split(/\sWHERE\s/i);
+  const queryWithoutWhere = whereSplit[0].trim();
+
+  const deleteRegex = /^DELETE FROM (\w+)/i;
+  const deleteMatch = queryWithoutWhere.match(deleteRegex);
+
+  let whereClauses =
+    whereSplit.length > 1 ? parseWhereClause(whereSplit[1]) : [];
+    
+  if (deleteMatch) {
+    const [, table] = deleteMatch;
+    return {
+      type: "DELETE",
+      table,
+      whereClauses,
+    };
+  } else {
+    throw new Error(`Malformed DELETE query`);
+  }
+}
+
+module.exports = {
+  parseSelectQuery,
+  parseJoinClause,
+  parseInsertQuery,
+  parseDeleteQuery,
+};

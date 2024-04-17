@@ -16,7 +16,9 @@ const readCSV = (filePath) => {
 const writeCSV = (filePath, jsonData) => {
   return new Promise((resolve, reject) => {
     let writeStream = fs.createWriteStream(filePath);
-    writeStream.write(Object.keys(jsonData[0]).join(",") + "\n"); // Write the header
+
+    // Write the contents
+    writeStream.write(Object.keys(jsonData[0]).join(",") + "\n");
     jsonData.forEach((row) => {
       writeStream.write(Object.values(row).join(",") + "\n");
     });

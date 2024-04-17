@@ -377,4 +377,4 @@ function applyGroupBy(data, groupByFields, aggregateFunctions) {
   });
 }
 
-module.exports = executeSELECTQuery;
+module.exports = { executeSELECTQuery, evaluateCondition };

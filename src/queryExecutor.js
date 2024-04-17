@@ -1,4 +1,5 @@
-const { parseInsertQuery } = require("./queryParser");
+const { parseInsertQuery, parseDeleteQuery } = require("./queryParser");
+const { evaluateCondition } = require("./index");
 const { readCSV, writeCSV } = require("./csvReader");
 
 async function executeINSERTQuery(query) {
@@ -15,4 +16,19 @@ async function executeINSERTQuery(query) {
   return writeCSV(file, [...currentData, newData]);
 }
 
-module.exports = executeINSERTQuery;
+async function executeDELETEQuery(query) {
+  const { table, whereClauses } = parseDeleteQuery(query);
+  const file = `${table}.csv`;
+
+  const currentData = await readCSV(file);
+  let updatedData =
+    whereClauses.length > 0
+      ? currentData.filter((row) =>
+          whereClauses.every((clause) => !evaluateCondition(row, clause))
+        )
+      : [];
+
+  return writeCSV(file, updatedData);
+}
+
+module.exports = { executeINSERTQuery, executeDELETEQuery };
