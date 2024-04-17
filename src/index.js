@@ -253,13 +253,6 @@ function evaluateCondition(row, clause) {
   const rowValue = parseValue(row[field]);
   let conditionValue = parseValue(value);
 
-  if (operator === "LIKE") {
-    const regexPattern =
-      "^" + value.replace(/%/g, ".*").replace(/_/g, ".") + "$";
-    const regex = new RegExp(regexPattern, "i"); // 'i' for case-insensitive matching
-    return regex.test(row[field]);
-  }
-
   switch (operator) {
     case "=":
       return rowValue === conditionValue;
@@ -273,6 +266,10 @@ function evaluateCondition(row, clause) {
       return rowValue >= conditionValue;
     case "<=":
       return rowValue <= conditionValue;
+    case "LIKE":
+      const regexPattern = "^" + value.replace(/%/g, ".*").replace(/_/g, ".") + "$";
+      return (regex = new RegExp(regexPattern, "i").test(row[field])); // 'i' for case-insensitive matching
+
     default:
       throw new Error(`Unsupported operator: ${operator}`);
   }
