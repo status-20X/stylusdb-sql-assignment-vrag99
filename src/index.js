@@ -114,6 +114,7 @@ async function executeSELECTQuery(query) {
       hasAggregateWithoutGroupBy,
       orderByFields,
       limit,
+      isDistinct,
     } = parseQuery(query);
     let data = await readCSV(`${table}.csv`);
 
@@ -142,7 +143,17 @@ async function executeSELECTQuery(query) {
           )
         : data;
 
-    let groupResults = filteredData;
+    let groupResults = isDistinct
+      ? [
+          ...new Map(
+            filteredData.map((item) => [
+              fields.map((field) => item[field]).join("|"),
+              item,
+            ])
+          ).values(),
+        ]
+      : filteredData;
+    
     if (hasAggregateWithoutGroupBy) {
       // Special handling for queries like 'SELECT COUNT(*) FROM table'
       const result = {};

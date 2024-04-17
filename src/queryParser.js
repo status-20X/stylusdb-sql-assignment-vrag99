@@ -1,6 +1,6 @@
 function parseQuery(query) {
-  // Trim the query to remove any leading/trailing whitespaces
   try {
+    // Trim the query to remove any leading/trailing whitespaces
     query = query.trim();
 
     const limitSplit = query.split(/\sLIMIT\s/i);
@@ -14,12 +14,12 @@ function parseQuery(query) {
     let orderByFields =
       orderBySplit.length > 1
         ? orderBySplit[1]
-          .trim()
-          .split(",")
-          .map((field) => {
-            const [fieldName, order] = field.trim().split(/\s+/);
-            return { fieldName, order: order ? order.toUpperCase() : "ASC" };
-          })
+            .trim()
+            .split(",")
+            .map((field) => {
+              const [fieldName, order] = field.trim().split(/\s+/);
+              return { fieldName, order: order ? order.toUpperCase() : "ASC" };
+            })
         : null;
 
     // Split the query at the GROUP BY clause if it exists
@@ -30,9 +30,9 @@ function parseQuery(query) {
     let groupByFields =
       groupBySplit.length > 1
         ? groupBySplit[1]
-          .trim()
-          .split(",")
-          .map((field) => field.trim())
+            .trim()
+            .split(",")
+            .map((field) => field.trim())
         : null;
 
     // Split the query at the WHERE clause if it exists
@@ -44,7 +44,13 @@ function parseQuery(query) {
 
     // Split the remaining query at the JOIN clause if it exists
     const joinSplit = queryWithoutWhere.split(/\s(INNER|LEFT|RIGHT) JOIN\s/i);
-    const selectPart = joinSplit[0].trim(); // Everything before JOIN clause
+    let selectPart = joinSplit[0].trim(); // Everything before JOIN clause
+
+    let isDistinct = false;
+    if (selectPart.toUpperCase().includes("SELECT DISTINCT")) {
+      isDistinct = true;
+      selectPart = selectPart.replace("DISTINCT", "").trim();
+    }
 
     // Parse the SELECT part
     const selectRegex = /^SELECT\s(.+?)\sFROM\s(.+)/i;
@@ -83,6 +89,7 @@ function parseQuery(query) {
       hasAggregateWithoutGroupBy,
       orderByFields,
       limit,
+      isDistinct,
     };
   } catch (error) {
     throw new Error(`Query parsing error: ${error.message}`);
