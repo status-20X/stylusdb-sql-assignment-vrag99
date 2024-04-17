@@ -153,7 +153,7 @@ async function executeSELECTQuery(query) {
           ).values(),
         ]
       : filteredData;
-    
+
     if (hasAggregateWithoutGroupBy) {
       // Special handling for queries like 'SELECT COUNT(*) FROM table'
       const result = {};
@@ -252,6 +252,13 @@ function evaluateCondition(row, clause) {
   // Parse row value and condition value based on their actual types
   const rowValue = parseValue(row[field]);
   let conditionValue = parseValue(value);
+
+  if (operator === "LIKE") {
+    const regexPattern =
+      "^" + value.replace(/%/g, ".*").replace(/_/g, ".") + "$";
+    const regex = new RegExp(regexPattern, "i"); // 'i' for case-insensitive matching
+    return regex.test(row[field]);
+  }
 
   switch (operator) {
     case "=":
