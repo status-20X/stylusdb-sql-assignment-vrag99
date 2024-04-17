@@ -1,5 +1,5 @@
-const { parseQuery } = require("./queryParser");
-const readCSV = require("./csvReader");
+const { parseSelectQuery } = require("./queryParser");
+const { readCSV } = require("./csvReader");
 
 function performInnerJoin(data, joinData, joinCondition, fields, table) {
   return data.flatMap((mainRow) => {
@@ -115,7 +115,7 @@ async function executeSELECTQuery(query) {
       orderByFields,
       limit,
       isDistinct,
-    } = parseQuery(query);
+    } = parseSelectQuery(query);
     let data = await readCSV(`${table}.csv`);
 
     // Perform INNER JOIN if specified
@@ -267,7 +267,8 @@ function evaluateCondition(row, clause) {
     case "<=":
       return rowValue <= conditionValue;
     case "LIKE":
-      const regexPattern = "^" + value.replace(/%/g, ".*").replace(/_/g, ".") + "$";
+      const regexPattern =
+        "^" + value.replace(/%/g, ".*").replace(/_/g, ".") + "$";
       return (regex = new RegExp(regexPattern, "i").test(row[field])); // 'i' for case-insensitive matching
 
     default:

@@ -13,4 +13,23 @@ const readCSV = (filePath) => {
   });
 };
 
-module.exports = readCSV;
+const writeCSV = (filePath, jsonData) => {
+  return new Promise((resolve, reject) => {
+    let writeStream = fs.createWriteStream(filePath);
+    writeStream.write(Object.keys(jsonData[0]).join(",") + "\n"); // Write the header
+    jsonData.forEach((row) => {
+      writeStream.write(Object.values(row).join(",") + "\n");
+    });
+
+    writeStream.end();
+    writeStream
+      .on("finish", () => {
+        resolve();
+      })
+      .on("error", (error) => {
+        reject(error);
+      });
+  });
+};
+
+module.exports = { readCSV, writeCSV };

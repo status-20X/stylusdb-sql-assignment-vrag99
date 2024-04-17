@@ -1,4 +1,4 @@
-function parseQuery(query) {
+function parseSelectQuery(query) {
   try {
     // Trim the query to remove any leading/trailing whitespaces
     query = query.trim();
@@ -136,4 +136,22 @@ function parseJoinClause(query) {
   };
 }
 
-module.exports = { parseQuery, parseJoinClause };
+function parseInsertQuery(query) {
+  const insertRegex = /^INSERT INTO (\w+) \((.+)\) VALUES \((.+)\)$/i;
+  const insertMatch = query.match(insertRegex);
+
+  if (!insertMatch) {
+    throw new Error("Invalid INSERT query format");
+  }
+
+  const [, table, columns, values] = insertMatch;
+
+  return {
+    type: "INSERT",
+    table,
+    columns: columns.split(",").map((column) => column.trim()),
+    values: values.split(",").map((value) => value.trim().replace(/^'(.*)'$/, '$1')),
+  };
+}
+
+module.exports = { parseSelectQuery, parseJoinClause, parseInsertQuery };
