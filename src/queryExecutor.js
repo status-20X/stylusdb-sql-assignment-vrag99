@@ -30,7 +30,6 @@ async function executeDELETEQuery(query) {
       : [];
 
   await writeCSV(file, updatedData);
-
   return { message: "Rows deleted successfully." };
 }
 
